@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental House - منتجات طب الأسنان</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Dental House</h1>
+    </header>
+    
+    <div class="search-bar">
+        <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="ابحث عن المنتجات...">
+    </div>
+
+    <main class="products-container">
+        <div class="product">
+            <h2>معجون أسنان</h2>
+            <p>السعر: 50 جنيهًا مصريًا</p>
+            <button onclick="addToCart('معجون أسنان', 50)">أضف إلى السلة</button>
+        </div>
+        <div class="product">
+            <h2>فرشاة أسنان</h2>
+            <p>السعر: 30 جنيهًا مصريًا</p>
+            <button onclick="addToCart('فرشاة أسنان', 30)">أضف إلى السلة</button>
+        </div>
+        <!-- يمكنك إضافة المزيد من المنتجات هنا -->
+    </main>
+    
+    <div class="shopping-cart">
+        <h2>عربة التسوق</h2>
+        <table id="cart">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    <th>السعر الواحد</th>
+                    <th>الكمية</th>
+                    <th>الإجمالي</th>
+                    <th>إزالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم إضافة المنتجات المحددة هنا ديناميكيًا -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">الإجمالي</td>
+                    <td id="total">0 جنيهًا مصريًا</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+        <button onclick="checkout()">شراء</button>
+        <button onclick="emptyCart()">إفراغ السلة</button>
+    </div>
+
+    <div class="payment-options">
+        <h2>طرق الدفع</h2>
+        <img src="vodafone-cash-qr-code.png" alt="Vodafone Cash QR Code" onclick="showPaymentMessage('Vodafone Cash')">
+        <img src="instapay-qr-code.png" alt="InstaPay QR Code" onclick="showPaymentMessage('InstaPay')">
+    </div>
+
+    <footer>
+        <p>© 2024 Dental House. جميع الحقوق محفوظة.</p>
+        <p>مدير الشركة: محمود عبد الموجود - رقم الهاتف: 01221641212</p>
+        <p>مصمم الموقع: عمر أسامة</p>
+    </footer>
+    
+    <script>
+        let cart = [];
+        
+        function addToCart(productName, price) {
+            let found = cart.find(item => item.name === productName);
+            if (found) {
+                found.quantity++;
+                found.total = found.quantity * price;
+            } else {
+                let product = {
+                    name: productName,
+                    price: price,
+                    quantity: 1,
+                    total: price
+                };
+                cart.push(product);
+            }
+            
+            displayCart();
+        }
+        
+        function displayCart() {
+            let cartTable = document.getElementById("cart").getElementsByTagName('tbody')[0];
+            cartTable.innerHTML = '';
+            let total = 0;
+            
+            cart.forEach(function(item) {
+                let row = cartTable.insertRow();
+                let nameCell = row.insertCell(0);
+                let priceCell = row.insertCell(1);
+                let quantityCell = row.insertCell(2);
+                let totalItemCell = row.insertCell(3);
+                let removeCell = row.insertCell(4);
+                
+                nameCell.innerHTML = item.name;
+                priceCell.innerHTML = item.price + " جنيهًا مصريًا";
+                quantityCell.innerHTML = `<input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${cart.indexOf(item)}, this.value)">`;
+                totalItemCell.innerHTML = item.total + " جنيهًا مصريًا";
+                
+                total += item.total;
+                
+                removeCell.innerHTML = `<button onclick="removeFromCart(${cart.indexOf(item)})">إزالة</button>`;
+            });
+            
+            document.getElementById("total").innerHTML = total + " جنيهًا مصريًا";
+        }
+        
+        function updateQuantity(index, newQuantity) {
+            cart[index].quantity = parseInt(newQuantity);
+            cart[index].total = cart[index].quantity * cart[index].price;
+            displayCart();
+        }
+        
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            displayCart();
+        }
+        
+        function checkout() {
+            alert("لقد تمت عملية الشراء بنجاح! الرجاء التوجه إلى طرق الدفع.");
+        }
+        
+        function emptyCart() {
+            cart = [];
+            displayCart();
+            alert("تم إفراغ السلة بنجاح!");
+        }
+        
+        function searchProducts() {
+            let input = document.getElementById("searchInput").value.toUpperCase();
+            let products = document.querySelectorAll('.product');
+            
+            products.forEach(function(product) {
+                let productName = product.querySelector('h2');
+                if (productName.innerText.toUpperCase().indexOf(input) > -1) {
+                    product.style.display = "";
+                } else {
+                    product.style.display = "none";
+                }
+            });
+        }
+        
+        function showPaymentMessage(paymentMethod) {
+            alert(`الرجاء استخدام ${paymentMethod} QR Code لإتمام عملية الدفع.`);
+        }
+    </script>
+</body>
+</html>
